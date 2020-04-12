@@ -5,22 +5,13 @@ function App() {
    return (
       <div className="container">
          <div className="row">
-            <div className="col-md-8">
+            <div className="col-md-12">
                <div className="card">
                   <div className="card-header">Home Page</div>
 
                   <div className="card-body">
-                     This is the Home Page.
-              </div>
-               </div>
-            </div>
-            <div className="col-md-4">
-               <div className="card">
-                  <div className="card-header">Side Bar</div>
-
-                  <div className="card-body">
-                     This is a Side Bar.
-              </div>
+                     Order pizza on the menu.
+                  </div>
                </div>
             </div>
          </div>
