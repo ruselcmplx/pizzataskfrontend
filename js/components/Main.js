@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { useRouteMatch, Link } from 'react-router-dom';
 
-function App() {
+function Main() {
    return (
       <div className="container">
          <div className="row">
@@ -10,7 +11,7 @@ function App() {
                   <div className="card-header">Home Page</div>
 
                   <div className="card-body">
-                     Order pizza on the menu.
+                     Order pizza on the <a href='/menu'>menu</a>.
                   </div>
                </div>
             </div>
@@ -19,8 +20,8 @@ function App() {
    );
 }
 
-export default App;
+export default Main;
 
 if (document.getElementById('root')) {
-   ReactDOM.render(<App />, document.getElementById('root'));
+   ReactDOM.render(<Main />, document.getElementById('root'));
 }

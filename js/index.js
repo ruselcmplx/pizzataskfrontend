@@ -2,18 +2,21 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-import App from './components/App';
+import Main from './components/Main';
 import Menu from './components/Menu';
 
 const root = document.getElementById('root');
 
 if (root) {
+   const onClickMenuLink = () => {
+      return;
+   }
    ReactDOM.render((
       <BrowserRouter>
          <div className="justify-content-center">
             <Switch>
                <Route exact path="/menu" component={Menu} />
-               <Route component={App} />
+               <Route component={Main} />
             </Switch>
          </div>
       </BrowserRouter>

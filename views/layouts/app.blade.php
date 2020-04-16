@@ -33,7 +33,7 @@
             </li>
             @else
             <li class="nav-item">
-               {{ Auth::user()->name }} <span class=""></span>
+               <span class="nav-link">{{ Auth::user()->name }}</span>
             </li>
             <li class="nav-item">
                <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();">

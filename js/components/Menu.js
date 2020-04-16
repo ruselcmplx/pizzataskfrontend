@@ -74,10 +74,68 @@ export default class Menu extends React.Component {
    constructor(props) {
       super(props);
 
-      this.state = { menu_data };
+      this.state = { menu_data, orderPrice: 0, order: {}, eur_to_usd_multiplier: 1 };
+
+      this.handleOrderChange = this.handleOrderChange.bind(this);
+   }
+
+   componentDidMount() {
+      fetch('https://api.exchangeratesapi.io/latest?base=USD').then(res => {
+         res.json().then(data => {
+            this.setState({ eur_to_usd_multiplier: data.rates.EUR });
+         })
+      });
+   }
+
+   handleOrderChange(amount, item) {
+      const currentOrder = this.state.order;
+      const itemId = item.id;
+      let newPrice = 0;
+
+      if (currentOrder.hasOwnProperty(itemId)) {
+         if (amount) {
+            currentOrder[itemId] = {
+               name: item.name,
+               total_price: +(item.price * amount).toFixed(2),
+               amount
+            };
+         } else {
+            delete currentOrder[itemId];
+         }
+      } else if (amount) {
+         currentOrder[itemId] = {
+            name: item.name,
+            total_price: +(item.price * amount).toFixed(2),
+            amount
+         }
+      }
+
+      for (const id in currentOrder) {
+         if (currentOrder.hasOwnProperty(id)) {
+            const orderItem = currentOrder[id];
+            newPrice += orderItem.total_price
+         }
+      }
+
+      const formattedPrice = +newPrice.toFixed(2);
+      this.setState({
+         // +delievery
+         orderPrice: Math.fround(formattedPrice + 123).toFixed(2),
+         order: currentOrder
+      });
+
+      $('#order_price').toast(formattedPrice ? 'show' : 'dispose');
    }
 
    render() {
+      const order = this.state.order;
+      const orderItems = [];
+      for (const id in order) {
+         if (order.hasOwnProperty(id)) {
+            orderItems.push(order[id]);
+         }
+      }
+
       return (
          <div className="container">
             <div className="row">
@@ -86,12 +144,35 @@ export default class Menu extends React.Component {
                      <div className="card-header">Menu</div>
                      <div className="card-body">
                         <div className="container">
-                           <div className="row">
-                              {this.state.menu_data.map(item => <MenuItem key={item.index} data={item }/>)}
+                           <div className="row mb-5">
+                              {this.state.menu_data.map(item => <MenuItem key={item.index} data={item} handleOrderChange={this.handleOrderChange} />)}
                            </div>
                         </div>
                      </div>
                   </div>
+               </div>
+            </div>
+            <div id="order_price" className="order_price toast fixed-bottom ml-3 mb-3" role="alert" data-autohide="false">
+               <div className="toast-header">
+                  <strong className="mr-auto">Your order</strong>
+
+               </div>
+               <div className="toast-body">
+                  <ul className="list-unstyled">
+                     <li>
+                        <ul>
+                           {
+                              orderItems.map((item, index) => <li key={index}><strong>{item.name}:</strong> {item.amount} pcs.</li>)
+                           }
+                        </ul>
+                     </li>
+                     <li>
+                        Delievery costs: {'123$'}
+                     </li>
+                     <li>
+                        <strong>Total price: {this.state.orderPrice + '$'},  {+(this.state.orderPrice * this.state.eur_to_usd_multiplier).toFixed(2) + '€'}</strong>
+                     </li>
+                  </ul>
                </div>
             </div>
          </div>

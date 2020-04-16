@@ -11,24 +11,37 @@ export default class MenuItem extends React.Component {
    }
 
    handleChange(event) {
-      this.setState({ value: event.target.value });
+      const value = event.target.value;
+      this.setState({ value });
+      this.props.handleOrderChange(value, this.props.data);
    }
 
    handleAdd() {
-      this.setState({ value: this.state.value+1 });
+      const value = this.state.value + 1;
+      this.setState({ value });
+      this.props.handleOrderChange(value, this.props.data);
    }
 
    handleRemove() {
-      this.setState({ value: this.state.value ? this.state.value-1 : 0 });
+      if (!this.state.value) {
+         return;
+      }
+      
+      const value = this.state.value - 1;
+
+      if (this.state.value) {
+         this.props.handleOrderChange(value, this.props.data);
+      }
+      this.setState({ value });
    }
 
    render() {
       const data = this.props.data;
 
       return (
-         <div className="container col-sm-3 mb-3">
+         <div className="container col-sm-4 mb-3">
             <div className="card h-100">
-               <img src={data.img} className="card-img-top" />
+               <img src={data.img} className="card-img-top bg-light" />
                <div className="card-body d-flex flex-column justify-content-between">
                   <h3 className="card-title">{data.name}</h3>
                   <h5 className="card-subtitle">{data.price}</h5>
