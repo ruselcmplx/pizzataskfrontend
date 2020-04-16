@@ -10,7 +10,7 @@ const root = document.getElementById('root');
 if (root) {
    ReactDOM.render((
       <BrowserRouter>
-         <div className="row justify-content-center">
+         <div className="justify-content-center">
             <Switch>
                <Route exact path="/menu" component={Menu} />
                <Route component={App} />

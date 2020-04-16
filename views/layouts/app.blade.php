@@ -16,7 +16,7 @@
 
 <body>
    <div>
-      <nav class="navbar navbar-expand-md navbar-light navbar-laravel row justify-content-center">
+      <nav class="navbar navbar-expand-md navbar-light navbar-laravel justify-content-center">
          <ul class="navbar-nav mt-2 mb-2">
             <li class="nav-item">
                <a class="nav-link" href="{{ route('home') }}">Home</a>
@@ -53,6 +53,14 @@
       </main>
    </div>
    <script type="text/javascript" src="{{ mix('/js/app.js') }}"></script>
+   <script>
+      window.Laravel = {
+         csrfToken: '{{ csrf_token() }}',
+         auth: {
+            user: '{{ auth()->user() }}'
+         }
+      }
+   </script>
 </body>
 
 </html>
