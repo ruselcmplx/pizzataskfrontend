@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { useRouteMatch, Link } from 'react-router-dom';
 
 function Main() {
    return (

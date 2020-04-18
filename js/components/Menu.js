@@ -1,6 +1,7 @@
 import React from 'react';
 
 import MenuItem from './MenuItem';
+import axios from 'axios';
 
 const menu_data = [
 
@@ -74,9 +75,18 @@ export default class Menu extends React.Component {
    constructor(props) {
       super(props);
 
-      this.state = { menu_data, orderPrice: 0, order: {}, eur_to_usd_multiplier: 1 };
+      this.state = { 
+         menu_data, 
+         order_price: 0, 
+         order: {}, 
+         eur_to_usd_multiplier: 1, 
+         delievery_costs: 0,
+         phone: ''
+      };
 
       this.handleOrderChange = this.handleOrderChange.bind(this);
+      this.handleOrderButtonClick = this.handleOrderButtonClick.bind(this);
+      this.handlePhoneChange = this.handlePhoneChange.bind(this);
    }
 
    componentDidMount() {
@@ -91,12 +101,13 @@ export default class Menu extends React.Component {
       const currentOrder = this.state.order;
       const itemId = item.id;
       let newPrice = 0;
+      let totalAmount = 0;
 
       if (currentOrder.hasOwnProperty(itemId)) {
          if (amount) {
             currentOrder[itemId] = {
                name: item.name,
-               total_price: +(item.price * amount).toFixed(2),
+               totalPrice: +(item.price * amount).toFixed(2),
                amount
             };
          } else {
@@ -105,7 +116,7 @@ export default class Menu extends React.Component {
       } else if (amount) {
          currentOrder[itemId] = {
             name: item.name,
-            total_price: +(item.price * amount).toFixed(2),
+            totalPrice: +(item.price * amount).toFixed(2),
             amount
          }
       }
@@ -113,18 +124,76 @@ export default class Menu extends React.Component {
       for (const id in currentOrder) {
          if (currentOrder.hasOwnProperty(id)) {
             const orderItem = currentOrder[id];
-            newPrice += orderItem.total_price
+            newPrice += orderItem.totalPrice
+            totalAmount += orderItem.amount;
          }
       }
 
       const formattedPrice = +newPrice.toFixed(2);
+      const delievery_costs = 19 * Math.ceil(totalAmount / 10);
+      
       this.setState({
          // +delievery
-         orderPrice: Math.fround(formattedPrice + 123).toFixed(2),
-         order: currentOrder
+         order_price: Math.fround(formattedPrice + delievery_costs).toFixed(2),
+         order: currentOrder,
+         delievery_costs
       });
 
       $('#order_price').toast(formattedPrice ? 'show' : 'dispose');
+   }
+
+   handleOrderButtonClick() {
+      const is_auth = window.Laravel.auth.user;
+      const request_data = {
+         phone: '',
+         order: JSON.stringify(this.state.order)
+      }
+      if (is_auth) {
+         // proceed
+         this.handleRequest(request_data);
+      } else {
+         const modal = new Promise((resolve, reject) => {
+            $('#phoneModalDialog').modal('show');
+
+            $('#phoneModalDialog .btn-proceed').click(() => {
+               const phone = this.state.phone;
+               if (phone && phone.match(/\d+/)) {
+                  resolve(this.state.phone);
+               } else {
+                  $('#phoneModalDialog .phone').addClass('border-danger');
+                  $('#phoneModalDialog .error').append('<div className="error-text">Please enter valid phone.</div>');
+                  reject();
+               }
+            })
+         }).then((phone) => {
+            // proceed with phone
+            request_data.phone = phone;
+            this.handleRequest(request_data);
+            $('#phoneModalDialog').modal('hide');
+         }).catch(() => {
+            return false;
+         });
+      }
+   }
+
+   handleRequest(data) {
+      const req = JSON.stringify(data);
+
+      axios.post('/order', req).then((res) => {
+         if (res && res.status === 200 && res.data) {
+            window.location.href="/order"
+         }
+      }).catch(() => {
+         return;
+      });
+   }
+
+   handlePhoneChange(event) {
+      $('#phoneModalDialog .phone').removeClass('border-danger');
+      $('#phoneModalDialog .error').empty();
+      this.setState({
+         phone: event.target.value
+      });
    }
 
    render() {
@@ -161,18 +230,41 @@ export default class Menu extends React.Component {
                   <ul className="list-unstyled">
                      <li>
                         <ul>
-                           {
-                              orderItems.map((item, index) => <li key={index}><strong>{item.name}:</strong> {item.amount} pcs.</li>)
-                           }
+                           {orderItems.map((item, index) => <li key={index}><strong>{item.name}:</strong> {item.amount} pcs.</li>)}
                         </ul>
                      </li>
                      <li>
-                        Delievery costs: {'123$'}
+                        Delievery costs: {this.state.delievery_costs + '$'}
                      </li>
-                     <li>
-                        <strong>Total price: {this.state.orderPrice + '$'},  {+(this.state.orderPrice * this.state.eur_to_usd_multiplier).toFixed(2) + '€'}</strong>
+                     <li className="mt-2">
+                        <strong>
+                           Total price:&nbsp;
+                           {this.state.order_price + '$'},&nbsp;
+                           {+(this.state.order_price * this.state.eur_to_usd_multiplier).toFixed(2) + '€'}
+                        </strong>
                      </li>
+                     <button type="button" className="btn btn-success mt-3" onClick={this.handleOrderButtonClick}>Proceed to order</button>
                   </ul>
+               </div>
+            </div>
+            <div className="modal phone_dialog" id="phoneModalDialog" role="dialog">
+               <div className="modal-dialog">
+                  <div className="modal-content">
+                        <div className="modal-header">Enter your phone:</div>
+                        <div className="modal-body">
+                           <input 
+                              type="tel" 
+                              className="phone form-control" 
+                              required
+                              value={this.state.phone} 
+                              onChange={this.handlePhoneChange}
+                           />
+                           <div className="error text-danger"></div>
+                        </div>
+                        <div className="modal-footer">
+                           <button className="btn btn-primary btn-proceed">Proceed</button>
+                        </div>
+                  </div>
                </div>
             </div>
          </div>

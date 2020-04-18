@@ -8,9 +8,6 @@ import Menu from './components/Menu';
 const root = document.getElementById('root');
 
 if (root) {
-   const onClickMenuLink = () => {
-      return;
-   }
    ReactDOM.render((
       <BrowserRouter>
          <div className="justify-content-center">
