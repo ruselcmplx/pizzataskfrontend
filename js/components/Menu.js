@@ -75,11 +75,11 @@ export default class Menu extends React.Component {
    constructor(props) {
       super(props);
 
-      this.state = { 
-         menu_data, 
-         order_price: 0, 
-         order: {}, 
-         eur_to_usd_multiplier: 1, 
+      this.state = {
+         menu_data,
+         order_price: 0,
+         order: {},
+         eur_to_usd_multiplier: 1,
          delievery_costs: 0,
          phone: ''
       };
@@ -146,13 +146,14 @@ export default class Menu extends React.Component {
       const is_auth = window.Laravel.auth.user;
       const request_data = {
          phone: '',
-         order: JSON.stringify(this.state.order)
-      }
+         order: JSON.stringify(this.state.order),
+         price: this.state.order_price
+      };
       if (is_auth) {
          // proceed
          this.handleRequest(request_data);
       } else {
-         const modal = new Promise((resolve, reject) => {
+         new Promise((resolve, reject) => {
             $('#phoneModalDialog').modal('show');
 
             $('#phoneModalDialog .btn-proceed').click(() => {
@@ -181,6 +182,7 @@ export default class Menu extends React.Component {
 
       axios.post('/order', req).then((res) => {
          if (res && res.status === 200 && res.data) {
+            window.localStorage.setItem('newPassword', res.data);
             window.location.href="/order"
          }
       }).catch(() => {
