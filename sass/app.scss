@@ -6,3 +6,9 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+
+.nav-container {
+   display: flex;
+   justify-content: space-between;
+}

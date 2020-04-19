@@ -1,28 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-import App from './components/App';
-import Products from './components/Products';
+import Main from './components/Main';
+import Menu from './components/Menu';
+import Order from './components/Order';
 
-ReactDOM.render((
-   <BrowserRouter>
-      <div>
-         <nav className="container">
-            <ul className="nav mt-2 mb-2">
-               <li className="nav-item">
-                  <Link className="nav-link" to="/">Home</Link>
-               </li>
-               <li className="nav-item">
-                  <Link className="nav-link" to="/products">List</Link>
-               </li>
-            </ul>
-         </nav>
+const root = document.getElementById('root');
 
-         <Switch>
-            <Route exact path="/products" component={Products} />
-            <Route component={App} />
-         </Switch>
-      </div>
-   </BrowserRouter>
-), document.getElementById('root'));
+if (root) {
+   ReactDOM.render((
+      <BrowserRouter>
+         <div className="justify-content-center">
+            <Switch>
+               <Route exact path="/menu" component={Menu} />
+               <Route exact path="/order" component={Order} />
+               <Route component={Main} />
+            </Switch>
+         </div>
+      </BrowserRouter>
+   ), root);
+}
